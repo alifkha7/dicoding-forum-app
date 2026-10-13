@@ -1,23 +1,52 @@
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Plus } from 'lucide-react';
 import ThreadList from '../components/ThreadList';
+import CategoryChips from '../components/CategoryChips';
 import { asyncPopulateUsersAndThreads } from '../states/shared/action';
 import {
   asyncToggleUpVoteThread,
   asyncToggleDownVoteThread,
 } from '../states/threads/action';
+import {
+  setCategoryActionCreator,
+  clearCategoryActionCreator,
+} from '../states/category/action';
 
 function HomePage() {
   const threads = useSelector((state) => state.threads || []);
   const users = useSelector((state) => state.users || []);
   const authUser = useSelector((state) => state.authUser);
+  const selectedCategory = useSelector((state) => state.category || '');
   const dispatch = useDispatch();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const urlCategory = searchParams.get('category') || '';
 
   useEffect(() => {
     dispatch(asyncPopulateUsersAndThreads());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (urlCategory !== selectedCategory) {
+      if (urlCategory) {
+        dispatch(setCategoryActionCreator(urlCategory));
+      } else {
+        dispatch(clearCategoryActionCreator());
+      }
+    }
+  }, [urlCategory, selectedCategory, dispatch]);
+
+  const onSelectCategory = (category) => {
+    if (category) {
+      setSearchParams({ category });
+      dispatch(setCategoryActionCreator(category));
+    } else {
+      setSearchParams({});
+      dispatch(clearCategoryActionCreator());
+    }
+  };
 
   const onUpVote = (id) => {
     dispatch(asyncToggleUpVoteThread(id));
@@ -27,7 +56,12 @@ function HomePage() {
     dispatch(asyncToggleDownVoteThread(id));
   };
 
-  const threadList = threads.map((thread) => ({
+  const categories = Array.from(new Set(threads.map((t) => t.category).filter(Boolean)));
+  const displayedThreads = selectedCategory
+    ? threads.filter((t) => t.category === selectedCategory)
+    : threads;
+
+  const threadList = displayedThreads.map((thread) => ({
     ...thread,
     user: users.find((user) => user.id === thread.ownerId),
   }));
@@ -51,6 +85,11 @@ function HomePage() {
       </div>
 
       <section aria-label="Daftar Diskusi">
+        <CategoryChips
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onSelectCategory={onSelectCategory}
+        />
         <ThreadList
           threads={threadList}
           upVote={onUpVote}
