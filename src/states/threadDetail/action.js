@@ -9,6 +9,8 @@ const ActionType = {
   TOGGLE_DOWNVOTE_THREAD_DETAIL: 'TOGGLE_DOWNVOTE_THREAD_DETAIL',
   TOGGLE_UPVOTE_COMMENT: 'TOGGLE_UPVOTE_COMMENT',
   TOGGLE_DOWNVOTE_COMMENT: 'TOGGLE_DOWNVOTE_COMMENT',
+  RESTORE_THREAD_DETAIL_VOTE: 'RESTORE_THREAD_DETAIL_VOTE',
+  RESTORE_COMMENT_VOTE: 'RESTORE_COMMENT_VOTE',
 };
 
 function receiveThreadDetailActionCreator(threadDetail) {
@@ -73,6 +75,27 @@ function toggleDownVoteCommentActionCreator({ commentId, userId }) {
   };
 }
 
+function restoreThreadDetailVoteActionCreator({ upVotesBy, downVotesBy }) {
+  return {
+    type: ActionType.RESTORE_THREAD_DETAIL_VOTE,
+    payload: {
+      upVotesBy,
+      downVotesBy,
+    },
+  };
+}
+
+function restoreCommentVoteActionCreator({ commentId, upVotesBy, downVotesBy }) {
+  return {
+    type: ActionType.RESTORE_COMMENT_VOTE,
+    payload: {
+      commentId,
+      upVotesBy,
+      downVotesBy,
+    },
+  };
+}
+
 function asyncReceiveThreadDetail(threadId) {
   return async (dispatch) => {
     dispatch(showLoading());
@@ -117,6 +140,8 @@ function asyncToggleUpVoteThreadDetail(threadId) {
 
     const targetThreadId = threadId || threadDetail?.id;
     const hasUpVoted = (threadDetail?.upVotesBy || []).includes(authUser.id);
+    const previousUpVotesBy = [...(threadDetail?.upVotesBy || [])];
+    const previousDownVotesBy = [...(threadDetail?.downVotesBy || [])];
 
     dispatch(toggleUpVoteThreadDetailActionCreator(authUser.id));
 
@@ -128,7 +153,10 @@ function asyncToggleUpVoteThreadDetail(threadId) {
       }
     } catch (error) {
       alert(error.message);
-      dispatch(toggleUpVoteThreadDetailActionCreator(authUser.id));
+      dispatch(restoreThreadDetailVoteActionCreator({
+        upVotesBy: previousUpVotesBy,
+        downVotesBy: previousDownVotesBy,
+      }));
     }
   };
 }
@@ -144,6 +172,8 @@ function asyncToggleDownVoteThreadDetail(threadId) {
 
     const targetThreadId = threadId || threadDetail?.id;
     const hasDownVoted = (threadDetail?.downVotesBy || []).includes(authUser.id);
+    const previousUpVotesBy = [...(threadDetail?.upVotesBy || [])];
+    const previousDownVotesBy = [...(threadDetail?.downVotesBy || [])];
 
     dispatch(toggleDownVoteThreadDetailActionCreator(authUser.id));
 
@@ -155,7 +185,10 @@ function asyncToggleDownVoteThreadDetail(threadId) {
       }
     } catch (error) {
       alert(error.message);
-      dispatch(toggleDownVoteThreadDetailActionCreator(authUser.id));
+      dispatch(restoreThreadDetailVoteActionCreator({
+        upVotesBy: previousUpVotesBy,
+        downVotesBy: previousDownVotesBy,
+      }));
     }
   };
 }
@@ -173,6 +206,8 @@ function asyncToggleUpVoteComment({ threadId, commentId }) {
       (comment) => comment.id === commentId,
     );
     const hasUpVoted = (targetComment?.upVotesBy || []).includes(authUser.id);
+    const previousUpVotesBy = [...(targetComment?.upVotesBy || [])];
+    const previousDownVotesBy = [...(targetComment?.downVotesBy || [])];
 
     dispatch(toggleUpVoteCommentActionCreator({ commentId, userId: authUser.id }));
 
@@ -184,7 +219,11 @@ function asyncToggleUpVoteComment({ threadId, commentId }) {
       }
     } catch (error) {
       alert(error.message);
-      dispatch(toggleUpVoteCommentActionCreator({ commentId, userId: authUser.id }));
+      dispatch(restoreCommentVoteActionCreator({
+        commentId,
+        upVotesBy: previousUpVotesBy,
+        downVotesBy: previousDownVotesBy,
+      }));
     }
   };
 }
@@ -202,6 +241,8 @@ function asyncToggleDownVoteComment({ threadId, commentId }) {
       (comment) => comment.id === commentId,
     );
     const hasDownVoted = (targetComment?.downVotesBy || []).includes(authUser.id);
+    const previousUpVotesBy = [...(targetComment?.upVotesBy || [])];
+    const previousDownVotesBy = [...(targetComment?.downVotesBy || [])];
 
     dispatch(toggleDownVoteCommentActionCreator({ commentId, userId: authUser.id }));
 
@@ -213,7 +254,11 @@ function asyncToggleDownVoteComment({ threadId, commentId }) {
       }
     } catch (error) {
       alert(error.message);
-      dispatch(toggleDownVoteCommentActionCreator({ commentId, userId: authUser.id }));
+      dispatch(restoreCommentVoteActionCreator({
+        commentId,
+        upVotesBy: previousUpVotesBy,
+        downVotesBy: previousDownVotesBy,
+      }));
     }
   };
 }
@@ -227,6 +272,8 @@ export {
   toggleDownVoteThreadDetailActionCreator,
   toggleUpVoteCommentActionCreator,
   toggleDownVoteCommentActionCreator,
+  restoreThreadDetailVoteActionCreator,
+  restoreCommentVoteActionCreator,
   asyncReceiveThreadDetail,
   asyncAddComment,
   asyncToggleUpVoteThreadDetail,

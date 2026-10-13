@@ -224,4 +224,49 @@ describe('threadsReducer function', () => {
       },
     ]);
   });
+
+  it('should restore upVotesBy and downVotesBy when given by RESTORE_THREAD_VOTE action', () => {
+    // arrange
+    const initialState = [
+      {
+        id: 'thread-1',
+        title: 'Thread Test 1',
+        upVotesBy: ['user-1'],
+        downVotesBy: [],
+      },
+      {
+        id: 'thread-2',
+        title: 'Thread Test 2',
+        upVotesBy: [],
+        downVotesBy: [],
+      },
+    ];
+    const action = {
+      type: ActionType.RESTORE_THREAD_VOTE,
+      payload: {
+        threadId: 'thread-1',
+        upVotesBy: [],
+        downVotesBy: ['user-1'],
+      },
+    };
+
+    // act
+    const nextState = threadsReducer(initialState, action);
+
+    // assert
+    expect(nextState).toEqual([
+      {
+        id: 'thread-1',
+        title: 'Thread Test 1',
+        upVotesBy: [],
+        downVotesBy: ['user-1'],
+      },
+      {
+        id: 'thread-2',
+        title: 'Thread Test 2',
+        upVotesBy: [],
+        downVotesBy: [],
+      },
+    ]);
+  });
 });

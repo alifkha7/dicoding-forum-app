@@ -86,6 +86,35 @@ function threadDetailReducer(threadDetail = null, action = {}) {
         }),
       };
     }
+    case ActionType.RESTORE_THREAD_DETAIL_VOTE: {
+      if (!threadDetail) {
+        return threadDetail;
+      }
+      return {
+        ...threadDetail,
+        upVotesBy: action.payload.upVotesBy,
+        downVotesBy: action.payload.downVotesBy,
+      };
+    }
+    case ActionType.RESTORE_COMMENT_VOTE: {
+      if (!threadDetail) {
+        return threadDetail;
+      }
+      const { commentId, upVotesBy, downVotesBy } = action.payload;
+      return {
+        ...threadDetail,
+        comments: (threadDetail.comments || []).map((comment) => {
+          if (comment.id !== commentId) {
+            return comment;
+          }
+          return {
+            ...comment,
+            upVotesBy,
+            downVotesBy,
+          };
+        }),
+      };
+    }
     default:
       return threadDetail;
   }

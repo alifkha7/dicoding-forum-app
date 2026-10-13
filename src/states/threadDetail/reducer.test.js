@@ -358,4 +358,63 @@ describe('threadDetailReducer function', () => {
       downVotesBy: [],
     });
   });
+
+  it('should restore upVotesBy and downVotesBy when given by RESTORE_THREAD_DETAIL_VOTE action', () => {
+    // arrange
+    const initialState = {
+      id: 'thread-1',
+      upVotesBy: ['user-1'],
+      downVotesBy: [],
+      comments: [],
+    };
+    const action = {
+      type: ActionType.RESTORE_THREAD_DETAIL_VOTE,
+      payload: {
+        upVotesBy: [],
+        downVotesBy: ['user-1'],
+      },
+    };
+
+    // act
+    const nextState = threadDetailReducer(initialState, action);
+
+    // assert
+    expect(nextState).toEqual({
+      ...initialState,
+      upVotesBy: [],
+      downVotesBy: ['user-1'],
+    });
+  });
+
+  it('should restore upVotesBy and downVotesBy when given by RESTORE_COMMENT_VOTE action', () => {
+    // arrange
+    const initialState = {
+      id: 'thread-1',
+      comments: [
+        {
+          id: 'comment-1',
+          upVotesBy: ['user-1'],
+          downVotesBy: [],
+        },
+      ],
+    };
+    const action = {
+      type: ActionType.RESTORE_COMMENT_VOTE,
+      payload: {
+        commentId: 'comment-1',
+        upVotesBy: [],
+        downVotesBy: ['user-1'],
+      },
+    };
+
+    // act
+    const nextState = threadDetailReducer(initialState, action);
+
+    // assert
+    expect(nextState.comments[0]).toEqual({
+      id: 'comment-1',
+      upVotesBy: [],
+      downVotesBy: ['user-1'],
+    });
+  });
 });

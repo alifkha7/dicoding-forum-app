@@ -13,12 +13,16 @@ import {
   setCategoryActionCreator,
   clearCategoryActionCreator,
 } from '../states/category/action';
+import {
+  selectFilteredThreads,
+  selectUniqueCategories,
+} from '../states/selectors';
 
 function HomePage() {
-  const threads = useSelector((state) => state.threads || []);
-  const users = useSelector((state) => state.users || []);
   const authUser = useSelector((state) => state.authUser);
   const selectedCategory = useSelector((state) => state.category || '');
+  const filteredThreads = useSelector(selectFilteredThreads);
+  const categories = useSelector(selectUniqueCategories);
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -56,16 +60,6 @@ function HomePage() {
     dispatch(asyncToggleDownVoteThread(id));
   };
 
-  const categories = Array.from(new Set(threads.map((t) => t.category).filter(Boolean)));
-  const displayedThreads = selectedCategory
-    ? threads.filter((t) => t.category === selectedCategory)
-    : threads;
-
-  const threadList = displayedThreads.map((thread) => ({
-    ...thread,
-    user: users.find((user) => user.id === thread.ownerId),
-  }));
-
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
@@ -91,7 +85,7 @@ function HomePage() {
           onSelectCategory={onSelectCategory}
         />
         <ThreadList
-          threads={threadList}
+          threads={filteredThreads}
           upVote={onUpVote}
           downVote={onDownVote}
           authUser={authUser}

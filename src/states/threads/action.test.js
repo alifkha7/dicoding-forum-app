@@ -12,6 +12,7 @@ import {
   addThreadActionCreator,
   toggleUpVoteThreadActionCreator,
   toggleDownVoteThreadActionCreator,
+  restoreThreadVoteActionCreator,
   asyncCreateThread,
   asyncToggleUpVoteThread,
   asyncToggleDownVoteThread,
@@ -173,7 +174,11 @@ describe('threads thunk actions', () => {
       expect(alertMock).toHaveBeenCalledWith(fakeErrorResponse.message);
       expect(dispatch).toHaveBeenNthCalledWith(
         2,
-        toggleUpVoteThreadActionCreator({ threadId: 'thread-1', userId: 'user-1' }),
+        restoreThreadVoteActionCreator({
+          threadId: 'thread-1',
+          upVotesBy: [],
+          downVotesBy: [],
+        }),
       );
     });
   });
@@ -252,7 +257,11 @@ describe('threads thunk actions', () => {
       expect(alertMock).toHaveBeenCalledWith(fakeErrorResponse.message);
       expect(dispatch).toHaveBeenNthCalledWith(
         2,
-        toggleDownVoteThreadActionCreator({ threadId: 'thread-1', userId: 'user-1' }),
+        restoreThreadVoteActionCreator({
+          threadId: 'thread-1',
+          upVotesBy: [],
+          downVotesBy: [],
+        }),
       );
     });
   });

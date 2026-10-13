@@ -38,6 +38,18 @@ function threadsReducer(threads = [], action = {}) {
           upVotesBy: (thread.upVotesBy || []).filter((id) => id !== action.payload.userId),
         };
       });
+    case ActionType.RESTORE_THREAD_VOTE:
+      return threads.map((thread) => {
+        if (thread.id !== action.payload.threadId) {
+          return thread;
+        }
+
+        return {
+          ...thread,
+          upVotesBy: action.payload.upVotesBy,
+          downVotesBy: action.payload.downVotesBy,
+        };
+      });
     default:
       return threads;
   }

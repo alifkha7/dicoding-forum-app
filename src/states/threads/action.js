@@ -6,6 +6,7 @@ const ActionType = {
   ADD_THREAD: 'ADD_THREAD',
   TOGGLE_UPVOTE_THREAD: 'TOGGLE_UPVOTE_THREAD',
   TOGGLE_DOWNVOTE_THREAD: 'TOGGLE_DOWNVOTE_THREAD',
+  RESTORE_THREAD_VOTE: 'RESTORE_THREAD_VOTE',
 };
 
 function receiveThreadsActionCreator(threads) {
@@ -46,6 +47,17 @@ function toggleDownVoteThreadActionCreator({ threadId, userId }) {
   };
 }
 
+function restoreThreadVoteActionCreator({ threadId, upVotesBy, downVotesBy }) {
+  return {
+    type: ActionType.RESTORE_THREAD_VOTE,
+    payload: {
+      threadId,
+      upVotesBy,
+      downVotesBy,
+    },
+  };
+}
+
 function asyncCreateThread({ title, body, category = '' }) {
   return async (dispatch) => {
     dispatch(showLoading());
@@ -74,6 +86,8 @@ function asyncToggleUpVoteThread(threadId) {
 
     const targetThread = threads.find((thread) => thread.id === threadId);
     const hasUpVoted = targetThread?.upVotesBy?.includes(authUser.id);
+    const previousUpVotesBy = [...(targetThread?.upVotesBy || [])];
+    const previousDownVotesBy = [...(targetThread?.downVotesBy || [])];
 
     dispatch(toggleUpVoteThreadActionCreator({ threadId, userId: authUser.id }));
 
@@ -85,7 +99,11 @@ function asyncToggleUpVoteThread(threadId) {
       }
     } catch (error) {
       alert(error.message);
-      dispatch(toggleUpVoteThreadActionCreator({ threadId, userId: authUser.id }));
+      dispatch(restoreThreadVoteActionCreator({
+        threadId,
+        upVotesBy: previousUpVotesBy,
+        downVotesBy: previousDownVotesBy,
+      }));
     }
   };
 }
@@ -101,6 +119,8 @@ function asyncToggleDownVoteThread(threadId) {
 
     const targetThread = threads.find((thread) => thread.id === threadId);
     const hasDownVoted = targetThread?.downVotesBy?.includes(authUser.id);
+    const previousUpVotesBy = [...(targetThread?.upVotesBy || [])];
+    const previousDownVotesBy = [...(targetThread?.downVotesBy || [])];
 
     dispatch(toggleDownVoteThreadActionCreator({ threadId, userId: authUser.id }));
 
@@ -112,7 +132,11 @@ function asyncToggleDownVoteThread(threadId) {
       }
     } catch (error) {
       alert(error.message);
-      dispatch(toggleDownVoteThreadActionCreator({ threadId, userId: authUser.id }));
+      dispatch(restoreThreadVoteActionCreator({
+        threadId,
+        upVotesBy: previousUpVotesBy,
+        downVotesBy: previousDownVotesBy,
+      }));
     }
   };
 }
@@ -123,6 +147,7 @@ export {
   addThreadActionCreator,
   toggleUpVoteThreadActionCreator,
   toggleDownVoteThreadActionCreator,
+  restoreThreadVoteActionCreator,
   asyncCreateThread,
   asyncToggleUpVoteThread,
   asyncToggleDownVoteThread,

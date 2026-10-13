@@ -16,6 +16,8 @@ import {
   toggleDownVoteThreadDetailActionCreator,
   toggleUpVoteCommentActionCreator,
   toggleDownVoteCommentActionCreator,
+  restoreThreadDetailVoteActionCreator,
+  restoreCommentVoteActionCreator,
   asyncReceiveThreadDetail,
   asyncAddComment,
   asyncToggleUpVoteThreadDetail,
@@ -234,7 +236,10 @@ describe('threadDetail thunk actions', () => {
       expect(alertMock).toHaveBeenCalledWith(fakeErrorResponse.message);
       expect(dispatch).toHaveBeenNthCalledWith(
         2,
-        toggleUpVoteThreadDetailActionCreator('user-1'),
+        restoreThreadDetailVoteActionCreator({
+          upVotesBy: [],
+          downVotesBy: [],
+        }),
       );
     });
   });
@@ -313,7 +318,10 @@ describe('threadDetail thunk actions', () => {
       expect(alertMock).toHaveBeenCalledWith(fakeErrorResponse.message);
       expect(dispatch).toHaveBeenNthCalledWith(
         2,
-        toggleDownVoteThreadDetailActionCreator('user-1'),
+        restoreThreadDetailVoteActionCreator({
+          upVotesBy: [],
+          downVotesBy: [],
+        }),
       );
     });
   });
@@ -401,7 +409,11 @@ describe('threadDetail thunk actions', () => {
       expect(alertMock).toHaveBeenCalledWith(fakeErrorResponse.message);
       expect(dispatch).toHaveBeenNthCalledWith(
         2,
-        toggleUpVoteCommentActionCreator({ commentId: 'comment-1', userId: 'user-1' }),
+        restoreCommentVoteActionCreator({
+          commentId: 'comment-1',
+          upVotesBy: [],
+          downVotesBy: [],
+        }),
       );
     });
   });
@@ -489,7 +501,11 @@ describe('threadDetail thunk actions', () => {
       expect(alertMock).toHaveBeenCalledWith(fakeErrorResponse.message);
       expect(dispatch).toHaveBeenNthCalledWith(
         2,
-        toggleDownVoteCommentActionCreator({ commentId: 'comment-1', userId: 'user-1' }),
+        restoreCommentVoteActionCreator({
+          commentId: 'comment-1',
+          upVotesBy: [],
+          downVotesBy: [],
+        }),
       );
     });
   });
