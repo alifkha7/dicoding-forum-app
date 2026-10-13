@@ -1,18 +1,27 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   MessageSquare,
   Trophy,
   LogIn,
   UserPlus,
+  LogOut,
 } from 'lucide-react';
+import { asyncUnsetAuthUser } from '../states/authUser/action';
 
 function Navbar() {
   const location = useLocation();
+  const authUser = useSelector((state) => state.authUser);
+  const dispatch = useDispatch();
 
   const isActive = (path) => (location.pathname === path
     ? 'text-blue-600 font-semibold'
     : 'text-gray-600 hover:text-blue-600');
+
+  const onLogout = () => {
+    dispatch(asyncUnsetAuthUser());
+  };
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-gray-200 bg-white/95 backdrop-blur">
@@ -43,20 +52,46 @@ function Navbar() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Link
-              to="/login"
-              className="inline-flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition"
-            >
-              <LogIn className="w-4 h-4" />
-              <span>Masuk</span>
-            </Link>
-            <Link
-              to="/register"
-              className="inline-flex items-center gap-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition"
-            >
-              <UserPlus className="w-4 h-4" />
-              <span>Daftar</span>
-            </Link>
+            {authUser ? (
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <img
+                    src={authUser.avatar}
+                    alt={authUser.name}
+                    className="w-8 h-8 rounded-full border border-gray-200 object-cover"
+                  />
+                  <span className="hidden sm:inline text-sm font-medium text-gray-700">
+                    {authUser.name}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition"
+                  aria-label="Logout"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Keluar</span>
+                </button>
+              </div>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="inline-flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Masuk</span>
+                </Link>
+                <Link
+                  to="/register"
+                  className="inline-flex items-center gap-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span>Daftar</span>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

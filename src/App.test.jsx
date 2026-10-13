@@ -1,13 +1,21 @@
 import React from 'react';
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import {
+  describe,
+  it,
+  expect,
+  vi,
+} from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import store from './states/store';
+import api from './utils/api';
 
 describe('App component', () => {
-  it('should render the Navbar and Home page content by default', () => {
+  it('should render the Navbar and Home page content after preload', async () => {
+    vi.spyOn(api, 'getOwnProfile').mockRejectedValue(new Error('Unauthorized'));
+
     render(
       <Provider store={store}>
         <BrowserRouter>
@@ -16,7 +24,9 @@ describe('App component', () => {
       </Provider>,
     );
 
-    expect(screen.getByRole('link', { name: /Dicoding Forum/i })).toBeInTheDocument();
-    expect(screen.getByText(/Diskusi Terbaru/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByRole('link', { name: /Dicoding Forum/i })).toBeInTheDocument();
+      expect(screen.getByText(/Diskusi Terbaru/i)).toBeInTheDocument();
+    });
   });
 });
