@@ -4,6 +4,8 @@ import api from '../../utils/api';
 const ActionType = {
   RECEIVE_THREADS: 'RECEIVE_THREADS',
   ADD_THREAD: 'ADD_THREAD',
+  TOGGLE_UPVOTE_THREAD: 'TOGGLE_UPVOTE_THREAD',
+  TOGGLE_DOWNVOTE_THREAD: 'TOGGLE_DOWNVOTE_THREAD',
 };
 
 function receiveThreadsActionCreator(threads) {
@@ -20,6 +22,26 @@ function addThreadActionCreator(thread) {
     type: ActionType.ADD_THREAD,
     payload: {
       thread,
+    },
+  };
+}
+
+function toggleUpVoteThreadActionCreator({ threadId, userId }) {
+  return {
+    type: ActionType.TOGGLE_UPVOTE_THREAD,
+    payload: {
+      threadId,
+      userId,
+    },
+  };
+}
+
+function toggleDownVoteThreadActionCreator({ threadId, userId }) {
+  return {
+    type: ActionType.TOGGLE_DOWNVOTE_THREAD,
+    payload: {
+      threadId,
+      userId,
     },
   };
 }
@@ -41,9 +63,67 @@ function asyncCreateThread({ title, body, category = '' }) {
   };
 }
 
+function asyncToggleUpVoteThread(threadId) {
+  return async (dispatch, getState) => {
+    const { authUser, threads = [] } = getState();
+
+    if (!authUser) {
+      alert('Silakan masuk terlebih dahulu untuk memberikan vote!');
+      return;
+    }
+
+    const targetThread = threads.find((thread) => thread.id === threadId);
+    const hasUpVoted = targetThread?.upVotesBy?.includes(authUser.id);
+
+    dispatch(toggleUpVoteThreadActionCreator({ threadId, userId: authUser.id }));
+
+    try {
+      if (hasUpVoted) {
+        await api.neutralizeThreadVote(threadId);
+      } else {
+        await api.upVoteThread(threadId);
+      }
+    } catch (error) {
+      alert(error.message);
+      dispatch(toggleUpVoteThreadActionCreator({ threadId, userId: authUser.id }));
+    }
+  };
+}
+
+function asyncToggleDownVoteThread(threadId) {
+  return async (dispatch, getState) => {
+    const { authUser, threads = [] } = getState();
+
+    if (!authUser) {
+      alert('Silakan masuk terlebih dahulu untuk memberikan vote!');
+      return;
+    }
+
+    const targetThread = threads.find((thread) => thread.id === threadId);
+    const hasDownVoted = targetThread?.downVotesBy?.includes(authUser.id);
+
+    dispatch(toggleDownVoteThreadActionCreator({ threadId, userId: authUser.id }));
+
+    try {
+      if (hasDownVoted) {
+        await api.neutralizeThreadVote(threadId);
+      } else {
+        await api.downVoteThread(threadId);
+      }
+    } catch (error) {
+      alert(error.message);
+      dispatch(toggleDownVoteThreadActionCreator({ threadId, userId: authUser.id }));
+    }
+  };
+}
+
 export {
   ActionType,
   receiveThreadsActionCreator,
   addThreadActionCreator,
+  toggleUpVoteThreadActionCreator,
+  toggleDownVoteThreadActionCreator,
   asyncCreateThread,
+  asyncToggleUpVoteThread,
+  asyncToggleDownVoteThread,
 };

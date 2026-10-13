@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MessageSquare, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
+import VoteButtons from './VoteButtons';
 import { postedAt } from '../utils';
 
 function stripHtml(html = '') {
@@ -17,6 +18,9 @@ function ThreadItem({
   downVotesBy = [],
   totalComments = 0,
   user = {},
+  upVote = null,
+  downVote = null,
+  authUser = null,
 }) {
   const authorName = user?.name || 'Anonim';
   const authorAvatar = user?.avatar || 'https://ui-avatars.com/api/?name=User';
@@ -58,14 +62,14 @@ function ThreadItem({
         </div>
 
         <div className="flex items-center gap-4 text-xs font-medium text-gray-500">
-          <div className="flex items-center gap-1" title="Up votes" aria-label="Up votes">
-            <ThumbsUp className="w-4 h-4 text-gray-400" />
-            <span>{upVotesBy.length}</span>
-          </div>
-          <div className="flex items-center gap-1" title="Down votes" aria-label="Down votes">
-            <ThumbsDown className="w-4 h-4 text-gray-400" />
-            <span>{downVotesBy.length}</span>
-          </div>
+          <VoteButtons
+            id={id}
+            upVotesBy={upVotesBy}
+            downVotesBy={downVotesBy}
+            upVote={upVote}
+            downVote={downVote}
+            authUser={authUser}
+          />
           <div className="flex items-center gap-1" title="Komentar" aria-label="Total komentar">
             <MessageSquare className="w-4 h-4 text-gray-400" />
             <span>{totalComments}</span>

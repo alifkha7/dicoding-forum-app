@@ -9,6 +9,10 @@ import { ActionType } from './action';
  *  - should return the initial state when given by unknown action
  *  - should return the threads when given by RECEIVE_THREADS action
  *  - should return the threads with the new thread when given by ADD_THREAD action
+ *  - should return threads with added upVote when given by TOGGLE_UPVOTE_THREAD action
+ *  - should return threads with removed upVote when given by TOGGLE_UPVOTE_THREAD (neutralize)
+ *  - should return threads with added downVote when given by TOGGLE_DOWNVOTE_THREAD action
+ *  - should return threads with removed downVote when given by TOGGLE_DOWNVOTE_THREAD (neutralize)
  */
 describe('threadsReducer function', () => {
   it('should return the initial state when given by unknown action', () => {
@@ -91,5 +95,133 @@ describe('threadsReducer function', () => {
 
     // assert
     expect(nextState).toEqual([newThread, ...initialState]);
+  });
+
+  it('should return threads with added upVote and removed downVote when given by TOGGLE_UPVOTE_THREAD action', () => {
+    // arrange
+    const initialState = [
+      {
+        id: 'thread-1',
+        title: 'Thread Test 1',
+        upVotesBy: [],
+        downVotesBy: ['user-1'],
+      },
+    ];
+    const action = {
+      type: ActionType.TOGGLE_UPVOTE_THREAD,
+      payload: {
+        threadId: 'thread-1',
+        userId: 'user-1',
+      },
+    };
+
+    // act
+    const nextState = threadsReducer(initialState, action);
+
+    // assert
+    expect(nextState).toEqual([
+      {
+        id: 'thread-1',
+        title: 'Thread Test 1',
+        upVotesBy: ['user-1'],
+        downVotesBy: [],
+      },
+    ]);
+  });
+
+  it('should return threads with removed upVote when given by TOGGLE_UPVOTE_THREAD action (neutralize)', () => {
+    // arrange
+    const initialState = [
+      {
+        id: 'thread-1',
+        title: 'Thread Test 1',
+        upVotesBy: ['user-1'],
+        downVotesBy: [],
+      },
+    ];
+    const action = {
+      type: ActionType.TOGGLE_UPVOTE_THREAD,
+      payload: {
+        threadId: 'thread-1',
+        userId: 'user-1',
+      },
+    };
+
+    // act
+    const nextState = threadsReducer(initialState, action);
+
+    // assert
+    expect(nextState).toEqual([
+      {
+        id: 'thread-1',
+        title: 'Thread Test 1',
+        upVotesBy: [],
+        downVotesBy: [],
+      },
+    ]);
+  });
+
+  it('should return threads with added downVote and removed upVote when given by TOGGLE_DOWNVOTE_THREAD action', () => {
+    // arrange
+    const initialState = [
+      {
+        id: 'thread-1',
+        title: 'Thread Test 1',
+        upVotesBy: ['user-1'],
+        downVotesBy: [],
+      },
+    ];
+    const action = {
+      type: ActionType.TOGGLE_DOWNVOTE_THREAD,
+      payload: {
+        threadId: 'thread-1',
+        userId: 'user-1',
+      },
+    };
+
+    // act
+    const nextState = threadsReducer(initialState, action);
+
+    // assert
+    expect(nextState).toEqual([
+      {
+        id: 'thread-1',
+        title: 'Thread Test 1',
+        upVotesBy: [],
+        downVotesBy: ['user-1'],
+      },
+    ]);
+  });
+
+  it('should return threads with removed downVote when given by TOGGLE_DOWNVOTE_THREAD action (neutralize)', () => {
+    // arrange
+    const initialState = [
+      {
+        id: 'thread-1',
+        title: 'Thread Test 1',
+        upVotesBy: [],
+        downVotesBy: ['user-1'],
+      },
+    ];
+    const action = {
+      type: ActionType.TOGGLE_DOWNVOTE_THREAD,
+      payload: {
+        threadId: 'thread-1',
+        userId: 'user-1',
+      },
+    };
+
+    // act
+    const nextState = threadsReducer(initialState, action);
+
+    // assert
+    expect(nextState).toEqual([
+      {
+        id: 'thread-1',
+        title: 'Thread Test 1',
+        upVotesBy: [],
+        downVotesBy: [],
+      },
+    ]);
   });
 });

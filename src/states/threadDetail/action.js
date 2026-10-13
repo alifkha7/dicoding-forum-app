@@ -5,6 +5,10 @@ const ActionType = {
   RECEIVE_THREAD_DETAIL: 'RECEIVE_THREAD_DETAIL',
   CLEAR_THREAD_DETAIL: 'CLEAR_THREAD_DETAIL',
   ADD_COMMENT: 'ADD_COMMENT',
+  TOGGLE_UPVOTE_THREAD_DETAIL: 'TOGGLE_UPVOTE_THREAD_DETAIL',
+  TOGGLE_DOWNVOTE_THREAD_DETAIL: 'TOGGLE_DOWNVOTE_THREAD_DETAIL',
+  TOGGLE_UPVOTE_COMMENT: 'TOGGLE_UPVOTE_COMMENT',
+  TOGGLE_DOWNVOTE_COMMENT: 'TOGGLE_DOWNVOTE_COMMENT',
 };
 
 function receiveThreadDetailActionCreator(threadDetail) {
@@ -27,6 +31,44 @@ function addCommentActionCreator(comment) {
     type: ActionType.ADD_COMMENT,
     payload: {
       comment,
+    },
+  };
+}
+
+function toggleUpVoteThreadDetailActionCreator(userId) {
+  return {
+    type: ActionType.TOGGLE_UPVOTE_THREAD_DETAIL,
+    payload: {
+      userId: typeof userId === 'object' && userId !== null ? userId.userId : userId,
+    },
+  };
+}
+
+function toggleDownVoteThreadDetailActionCreator(userId) {
+  return {
+    type: ActionType.TOGGLE_DOWNVOTE_THREAD_DETAIL,
+    payload: {
+      userId: typeof userId === 'object' && userId !== null ? userId.userId : userId,
+    },
+  };
+}
+
+function toggleUpVoteCommentActionCreator({ commentId, userId }) {
+  return {
+    type: ActionType.TOGGLE_UPVOTE_COMMENT,
+    payload: {
+      commentId,
+      userId,
+    },
+  };
+}
+
+function toggleDownVoteCommentActionCreator({ commentId, userId }) {
+  return {
+    type: ActionType.TOGGLE_DOWNVOTE_COMMENT,
+    payload: {
+      commentId,
+      userId,
     },
   };
 }
@@ -64,11 +106,131 @@ function asyncAddComment({ threadId, content }) {
   };
 }
 
+function asyncToggleUpVoteThreadDetail(threadId) {
+  return async (dispatch, getState) => {
+    const { authUser, threadDetail } = getState();
+
+    if (!authUser) {
+      alert('Silakan masuk terlebih dahulu untuk memberikan vote!');
+      return;
+    }
+
+    const targetThreadId = threadId || threadDetail?.id;
+    const hasUpVoted = (threadDetail?.upVotesBy || []).includes(authUser.id);
+
+    dispatch(toggleUpVoteThreadDetailActionCreator(authUser.id));
+
+    try {
+      if (hasUpVoted) {
+        await api.neutralizeThreadVote(targetThreadId);
+      } else {
+        await api.upVoteThread(targetThreadId);
+      }
+    } catch (error) {
+      alert(error.message);
+      dispatch(toggleUpVoteThreadDetailActionCreator(authUser.id));
+    }
+  };
+}
+
+function asyncToggleDownVoteThreadDetail(threadId) {
+  return async (dispatch, getState) => {
+    const { authUser, threadDetail } = getState();
+
+    if (!authUser) {
+      alert('Silakan masuk terlebih dahulu untuk memberikan vote!');
+      return;
+    }
+
+    const targetThreadId = threadId || threadDetail?.id;
+    const hasDownVoted = (threadDetail?.downVotesBy || []).includes(authUser.id);
+
+    dispatch(toggleDownVoteThreadDetailActionCreator(authUser.id));
+
+    try {
+      if (hasDownVoted) {
+        await api.neutralizeThreadVote(targetThreadId);
+      } else {
+        await api.downVoteThread(targetThreadId);
+      }
+    } catch (error) {
+      alert(error.message);
+      dispatch(toggleDownVoteThreadDetailActionCreator(authUser.id));
+    }
+  };
+}
+
+function asyncToggleUpVoteComment({ threadId, commentId }) {
+  return async (dispatch, getState) => {
+    const { authUser, threadDetail } = getState();
+
+    if (!authUser) {
+      alert('Silakan masuk terlebih dahulu untuk memberikan vote!');
+      return;
+    }
+
+    const targetComment = (threadDetail?.comments || []).find(
+      (comment) => comment.id === commentId,
+    );
+    const hasUpVoted = (targetComment?.upVotesBy || []).includes(authUser.id);
+
+    dispatch(toggleUpVoteCommentActionCreator({ commentId, userId: authUser.id }));
+
+    try {
+      if (hasUpVoted) {
+        await api.neutralizeCommentVote({ threadId, commentId });
+      } else {
+        await api.upVoteComment({ threadId, commentId });
+      }
+    } catch (error) {
+      alert(error.message);
+      dispatch(toggleUpVoteCommentActionCreator({ commentId, userId: authUser.id }));
+    }
+  };
+}
+
+function asyncToggleDownVoteComment({ threadId, commentId }) {
+  return async (dispatch, getState) => {
+    const { authUser, threadDetail } = getState();
+
+    if (!authUser) {
+      alert('Silakan masuk terlebih dahulu untuk memberikan vote!');
+      return;
+    }
+
+    const targetComment = (threadDetail?.comments || []).find(
+      (comment) => comment.id === commentId,
+    );
+    const hasDownVoted = (targetComment?.downVotesBy || []).includes(authUser.id);
+
+    dispatch(toggleDownVoteCommentActionCreator({ commentId, userId: authUser.id }));
+
+    try {
+      if (hasDownVoted) {
+        await api.neutralizeCommentVote({ threadId, commentId });
+      } else {
+        await api.downVoteComment({ threadId, commentId });
+      }
+    } catch (error) {
+      alert(error.message);
+      dispatch(toggleDownVoteCommentActionCreator({ commentId, userId: authUser.id }));
+    }
+  };
+}
+
 export {
   ActionType,
   receiveThreadDetailActionCreator,
   clearThreadDetailActionCreator,
   addCommentActionCreator,
+  toggleUpVoteThreadDetailActionCreator,
+  toggleDownVoteThreadDetailActionCreator,
+  toggleUpVoteCommentActionCreator,
+  toggleDownVoteCommentActionCreator,
   asyncReceiveThreadDetail,
   asyncAddComment,
+  asyncToggleUpVoteThreadDetail,
+  asyncToggleDownVoteThreadDetail,
+  asyncToggleUpVoteComment,
+  asyncToggleDownVoteComment,
 };

@@ -10,6 +10,14 @@ import { ActionType } from './action';
  *  - should return the threadDetail when given by RECEIVE_THREAD_DETAIL action
  *  - should return null when given by CLEAR_THREAD_DETAIL action
  *  - should return the threadDetail with new comment prepended when given by ADD_COMMENT action
+ *  - should return threadDetail with added upVote on TOGGLE_UPVOTE_THREAD_DETAIL
+ *  - should return threadDetail with removed upVote on TOGGLE_UPVOTE_THREAD_DETAIL
+ *  - should return threadDetail with added downVote on TOGGLE_DOWNVOTE_THREAD_DETAIL
+ *  - should return threadDetail with removed downVote on TOGGLE_DOWNVOTE_THREAD_DETAIL
+ *  - should return threadDetail with added comment upVote on TOGGLE_UPVOTE_COMMENT
+ *  - should return threadDetail with removed comment upVote on TOGGLE_UPVOTE_COMMENT
+ *  - should return threadDetail with added comment downVote on TOGGLE_DOWNVOTE_COMMENT
+ *  - should return threadDetail with removed comment downVote on TOGGLE_DOWNVOTE_COMMENT
  */
 describe('threadDetailReducer function', () => {
   it('should return the initial state when given by unknown action', () => {
@@ -120,6 +128,234 @@ describe('threadDetailReducer function', () => {
     expect(nextState).toEqual({
       ...initialState,
       comments: [newComment, ...initialState.comments],
+    });
+  });
+
+  it('should return threadDetail with added upVote and removed downVote when given by TOGGLE_UPVOTE_THREAD_DETAIL action', () => {
+    // arrange
+    const initialState = {
+      id: 'thread-1',
+      upVotesBy: [],
+      downVotesBy: ['user-1'],
+      comments: [],
+    };
+    const action = {
+      type: ActionType.TOGGLE_UPVOTE_THREAD_DETAIL,
+      payload: {
+        userId: 'user-1',
+      },
+    };
+
+    // act
+    const nextState = threadDetailReducer(initialState, action);
+
+    // assert
+    expect(nextState).toEqual({
+      ...initialState,
+      upVotesBy: ['user-1'],
+      downVotesBy: [],
+    });
+  });
+
+  it('should return threadDetail with removed upVote when given by TOGGLE_UPVOTE_THREAD_DETAIL action (neutralize)', () => {
+    // arrange
+    const initialState = {
+      id: 'thread-1',
+      upVotesBy: ['user-1'],
+      downVotesBy: [],
+      comments: [],
+    };
+    const action = {
+      type: ActionType.TOGGLE_UPVOTE_THREAD_DETAIL,
+      payload: {
+        userId: 'user-1',
+      },
+    };
+
+    // act
+    const nextState = threadDetailReducer(initialState, action);
+
+    // assert
+    expect(nextState).toEqual({
+      ...initialState,
+      upVotesBy: [],
+      downVotesBy: [],
+    });
+  });
+
+  it('should return threadDetail with added downVote and removed upVote when given by TOGGLE_DOWNVOTE_THREAD_DETAIL action', () => {
+    // arrange
+    const initialState = {
+      id: 'thread-1',
+      upVotesBy: ['user-1'],
+      downVotesBy: [],
+      comments: [],
+    };
+    const action = {
+      type: ActionType.TOGGLE_DOWNVOTE_THREAD_DETAIL,
+      payload: {
+        userId: 'user-1',
+      },
+    };
+
+    // act
+    const nextState = threadDetailReducer(initialState, action);
+
+    // assert
+    expect(nextState).toEqual({
+      ...initialState,
+      upVotesBy: [],
+      downVotesBy: ['user-1'],
+    });
+  });
+
+  it('should return threadDetail with removed downVote when given by TOGGLE_DOWNVOTE_THREAD_DETAIL action (neutralize)', () => {
+    // arrange
+    const initialState = {
+      id: 'thread-1',
+      upVotesBy: [],
+      downVotesBy: ['user-1'],
+      comments: [],
+    };
+    const action = {
+      type: ActionType.TOGGLE_DOWNVOTE_THREAD_DETAIL,
+      payload: {
+        userId: 'user-1',
+      },
+    };
+
+    // act
+    const nextState = threadDetailReducer(initialState, action);
+
+    // assert
+    expect(nextState).toEqual({
+      ...initialState,
+      upVotesBy: [],
+      downVotesBy: [],
+    });
+  });
+
+  it('should return threadDetail with added comment upVote when given by TOGGLE_UPVOTE_COMMENT action', () => {
+    // arrange
+    const initialState = {
+      id: 'thread-1',
+      comments: [
+        {
+          id: 'comment-1',
+          upVotesBy: [],
+          downVotesBy: ['user-1'],
+        },
+      ],
+    };
+    const action = {
+      type: ActionType.TOGGLE_UPVOTE_COMMENT,
+      payload: {
+        commentId: 'comment-1',
+        userId: 'user-1',
+      },
+    };
+
+    // act
+    const nextState = threadDetailReducer(initialState, action);
+
+    // assert
+    expect(nextState.comments[0]).toEqual({
+      id: 'comment-1',
+      upVotesBy: ['user-1'],
+      downVotesBy: [],
+    });
+  });
+
+  it('should return threadDetail with removed comment upVote when given by TOGGLE_UPVOTE_COMMENT action (neutralize)', () => {
+    // arrange
+    const initialState = {
+      id: 'thread-1',
+      comments: [
+        {
+          id: 'comment-1',
+          upVotesBy: ['user-1'],
+          downVotesBy: [],
+        },
+      ],
+    };
+    const action = {
+      type: ActionType.TOGGLE_UPVOTE_COMMENT,
+      payload: {
+        commentId: 'comment-1',
+        userId: 'user-1',
+      },
+    };
+
+    // act
+    const nextState = threadDetailReducer(initialState, action);
+
+    // assert
+    expect(nextState.comments[0]).toEqual({
+      id: 'comment-1',
+      upVotesBy: [],
+      downVotesBy: [],
+    });
+  });
+
+  it('should return threadDetail with added comment downVote when given by TOGGLE_DOWNVOTE_COMMENT action', () => {
+    // arrange
+    const initialState = {
+      id: 'thread-1',
+      comments: [
+        {
+          id: 'comment-1',
+          upVotesBy: ['user-1'],
+          downVotesBy: [],
+        },
+      ],
+    };
+    const action = {
+      type: ActionType.TOGGLE_DOWNVOTE_COMMENT,
+      payload: {
+        commentId: 'comment-1',
+        userId: 'user-1',
+      },
+    };
+
+    // act
+    const nextState = threadDetailReducer(initialState, action);
+
+    // assert
+    expect(nextState.comments[0]).toEqual({
+      id: 'comment-1',
+      upVotesBy: [],
+      downVotesBy: ['user-1'],
+    });
+  });
+
+  it('should return threadDetail with removed comment downVote when given by TOGGLE_DOWNVOTE_COMMENT action (neutralize)', () => {
+    // arrange
+    const initialState = {
+      id: 'thread-1',
+      comments: [
+        {
+          id: 'comment-1',
+          upVotesBy: [],
+          downVotesBy: ['user-1'],
+        },
+      ],
+    };
+    const action = {
+      type: ActionType.TOGGLE_DOWNVOTE_COMMENT,
+      payload: {
+        commentId: 'comment-1',
+        userId: 'user-1',
+      },
+    };
+
+    // act
+    const nextState = threadDetailReducer(initialState, action);
+
+    // assert
+    expect(nextState.comments[0]).toEqual({
+      id: 'comment-1',
+      upVotesBy: [],
+      downVotesBy: [],
     });
   });
 });

@@ -3,22 +3,26 @@ import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  ThumbsUp,
-  ThumbsDown,
   MessageSquare,
   ArrowLeft,
 } from 'lucide-react';
 import CommentInput from '../components/CommentInput';
 import CommentList from '../components/CommentList';
+import VoteButtons from '../components/VoteButtons';
 import {
   asyncReceiveThreadDetail,
   asyncAddComment,
+  asyncToggleUpVoteThreadDetail,
+  asyncToggleDownVoteThreadDetail,
+  asyncToggleUpVoteComment,
+  asyncToggleDownVoteComment,
 } from '../states/threadDetail/action';
 import { postedAt } from '../utils';
 
 function DetailPage() {
   const { id } = useParams();
   const threadDetail = useSelector((state) => state.threadDetail);
+  const authUser = useSelector((state) => state.authUser);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -26,6 +30,19 @@ function DetailPage() {
   }, [id, dispatch]);
 
   const onAddComment = ({ content }) => dispatch(asyncAddComment({ threadId: id, content }));
+
+  const onUpVoteThreadDetail = () => dispatch(asyncToggleUpVoteThreadDetail(id));
+  const onDownVoteThreadDetail = () => dispatch(asyncToggleDownVoteThreadDetail(id));
+
+  const onUpVoteComment = (commentId) => dispatch(asyncToggleUpVoteComment({
+    threadId: id,
+    commentId,
+  }));
+
+  const onDownVoteComment = (commentId) => dispatch(asyncToggleDownVoteComment({
+    threadId: id,
+    commentId,
+  }));
 
   if (!threadDetail) {
     return (
@@ -102,14 +119,14 @@ function DetailPage() {
         />
 
         <footer className="flex items-center gap-6 text-sm text-gray-600">
-          <div className="flex items-center gap-1.5" title="Up votes" aria-label="Up votes">
-            <ThumbsUp className="w-4 h-4 text-gray-400" />
-            <span>{upVotesBy.length}</span>
-          </div>
-          <div className="flex items-center gap-1.5" title="Down votes" aria-label="Down votes">
-            <ThumbsDown className="w-4 h-4 text-gray-400" />
-            <span>{downVotesBy.length}</span>
-          </div>
+          <VoteButtons
+            id={id}
+            upVotesBy={upVotesBy}
+            downVotesBy={downVotesBy}
+            upVote={onUpVoteThreadDetail}
+            downVote={onDownVoteThreadDetail}
+            authUser={authUser}
+          />
           <div className="flex items-center gap-1.5" title="Total komentar" aria-label="Total komentar">
             <MessageSquare className="w-4 h-4 text-gray-400" />
             <span>{comments.length}</span>
@@ -122,7 +139,12 @@ function DetailPage() {
           <CommentInput addComment={onAddComment} />
         </div>
 
-        <CommentList comments={comments} />
+        <CommentList
+          comments={comments}
+          upVote={onUpVoteComment}
+          downVote={onDownVoteComment}
+          authUser={authUser}
+        />
       </section>
     </main>
   );

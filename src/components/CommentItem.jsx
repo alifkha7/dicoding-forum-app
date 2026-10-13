@@ -1,14 +1,18 @@
 /* eslint-disable react/no-danger */
 import React from 'react';
-import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import VoteButtons from './VoteButtons';
 import { postedAt } from '../utils';
 
 function CommentItem({
+  id,
   content,
   createdAt,
   owner = {},
   upVotesBy = [],
   downVotesBy = [],
+  upVote = null,
+  downVote = null,
+  authUser = null,
 }) {
   const authorName = owner?.name || 'Anonim';
   const authorAvatar = owner?.avatar || 'https://ui-avatars.com/api/?name=User';
@@ -37,14 +41,14 @@ function CommentItem({
       />
 
       <footer className="flex items-center gap-4 pt-1 text-xs text-gray-500">
-        <div className="flex items-center gap-1" title="Up votes" aria-label="Up votes">
-          <ThumbsUp className="w-3.5 h-3.5 text-gray-400" />
-          <span>{upVotesBy.length}</span>
-        </div>
-        <div className="flex items-center gap-1" title="Down votes" aria-label="Down votes">
-          <ThumbsDown className="w-3.5 h-3.5 text-gray-400" />
-          <span>{downVotesBy.length}</span>
-        </div>
+        <VoteButtons
+          id={id}
+          upVotesBy={upVotesBy}
+          downVotesBy={downVotesBy}
+          upVote={upVote}
+          downVote={downVote}
+          authUser={authUser}
+        />
       </footer>
     </article>
   );

@@ -4,15 +4,28 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Plus } from 'lucide-react';
 import ThreadList from '../components/ThreadList';
 import { asyncPopulateUsersAndThreads } from '../states/shared/action';
+import {
+  asyncToggleUpVoteThread,
+  asyncToggleDownVoteThread,
+} from '../states/threads/action';
 
 function HomePage() {
   const threads = useSelector((state) => state.threads || []);
   const users = useSelector((state) => state.users || []);
+  const authUser = useSelector((state) => state.authUser);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(asyncPopulateUsersAndThreads());
   }, [dispatch]);
+
+  const onUpVote = (id) => {
+    dispatch(asyncToggleUpVoteThread(id));
+  };
+
+  const onDownVote = (id) => {
+    dispatch(asyncToggleDownVoteThread(id));
+  };
 
   const threadList = threads.map((thread) => ({
     ...thread,
@@ -38,7 +51,12 @@ function HomePage() {
       </div>
 
       <section aria-label="Daftar Diskusi">
-        <ThreadList threads={threadList} />
+        <ThreadList
+          threads={threadList}
+          upVote={onUpVote}
+          downVote={onDownVote}
+          authUser={authUser}
+        />
       </section>
     </main>
   );

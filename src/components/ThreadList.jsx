@@ -1,7 +1,12 @@
 import React from 'react';
 import ThreadItem from './ThreadItem';
 
-function ThreadList({ threads = [] }) {
+function ThreadList({
+  threads = [],
+  upVote = null,
+  downVote = null,
+  authUser = null,
+}) {
   if (!threads.length) {
     return (
       <div className="py-12 text-center bg-white rounded-xl border border-gray-200 shadow-sm">
@@ -24,6 +29,9 @@ function ThreadList({ threads = [] }) {
           downVotesBy={thread.downVotesBy}
           totalComments={thread.totalComments}
           user={thread.user}
+          upVote={upVote}
+          downVote={downVote}
+          authUser={authUser}
         />
       ))}
     </div>

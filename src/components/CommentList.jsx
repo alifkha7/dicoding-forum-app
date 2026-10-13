@@ -1,7 +1,12 @@
 import React from 'react';
 import CommentItem from './CommentItem';
 
-function CommentList({ comments = [] }) {
+function CommentList({
+  comments = [],
+  upVote = null,
+  downVote = null,
+  authUser = null,
+}) {
   return (
     <section className="space-y-4" aria-label="Daftar Komentar">
       <h3 className="text-base font-bold text-gray-900">
@@ -19,11 +24,15 @@ function CommentList({ comments = [] }) {
           {comments.map((comment) => (
             <CommentItem
               key={comment.id}
+              id={comment.id}
               content={comment.content}
               createdAt={comment.createdAt}
               owner={comment.owner}
               upVotesBy={comment.upVotesBy}
               downVotesBy={comment.downVotesBy}
+              upVote={upVote}
+              downVote={downVote}
+              authUser={authUser}
             />
           ))}
         </div>
