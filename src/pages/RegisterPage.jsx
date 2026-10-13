@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { UserPlus } from 'lucide-react';
 import RegisterInput from '../components/RegisterInput';
-import api from '../utils/api';
+import { asyncRegisterUser } from '../states/users/action';
 
 function RegisterPage() {
   const authUser = useSelector((state) => state.authUser);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,12 +17,10 @@ function RegisterPage() {
   }, [authUser, navigate]);
 
   const onRegister = async ({ name, email, password }) => {
-    try {
-      await api.register({ name, email, password });
+    const result = await dispatch(asyncRegisterUser({ name, email, password }));
+    if (result && result.success) {
       alert('Akun berhasil dibuat! Silakan masuk.');
       navigate('/login');
-    } catch (error) {
-      alert(error.message);
     }
   };
 
