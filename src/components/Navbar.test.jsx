@@ -85,6 +85,10 @@ describe('Navbar component', () => {
 
     expect(screen.getByText('John Doe')).toBeInTheDocument();
 
+    const createThreadLink = screen.getByRole('link', { name: /Buat Diskusi/i });
+    expect(createThreadLink).toBeInTheDocument();
+    expect(createThreadLink).toHaveAttribute('href', '/new');
+
     const logoutButton = screen.getByRole('button', { name: /Logout/i });
     expect(logoutButton).toBeInTheDocument();
 

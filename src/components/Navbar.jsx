@@ -7,6 +7,7 @@ import {
   LogIn,
   UserPlus,
   LogOut,
+  Plus,
 } from 'lucide-react';
 import { asyncUnsetAuthUser } from '../states/authUser/action';
 
@@ -53,7 +54,15 @@ function Navbar() {
 
           <div className="flex items-center gap-3">
             {authUser ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <Link
+                  to="/new"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition shadow-sm"
+                  aria-label="Buat Diskusi Baru"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">Buat Diskusi</span>
+                </Link>
                 <div className="flex items-center gap-2">
                   <img
                     src={authUser.avatar}
