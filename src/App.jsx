@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import LeaderboardsPage from './pages/LeaderboardsPage';
+import DetailPage from './pages/DetailPage';
 import NotFoundPage from './pages/NotFoundPage';
 import { asyncPreloadProcess } from './states/isPreload/action';
 
@@ -40,6 +41,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/leaderboards" element={<LeaderboardsPage />} />
+          <Route path="/threads/:id" element={<DetailPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
