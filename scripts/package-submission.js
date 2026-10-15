@@ -13,13 +13,20 @@ const EXCLUDE_NAMES = new Set([
   '.git',
   'dist',
   'storybook-static',
-  '.scratch',
-  '.gemini',
   'submission.zip',
-  'AGENTS.md',
-  'GLOSSARY.md',
-  'docs',
 ]);
+
+// Load local git exclusions if available (.git/info/exclude)
+const gitExcludePath = path.resolve(rootDir, '.git', 'info', 'exclude');
+if (fs.existsSync(gitExcludePath)) {
+  const lines = fs.readFileSync(gitExcludePath, 'utf8').split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed && !trimmed.startsWith('#')) {
+      EXCLUDE_NAMES.add(trimmed);
+    }
+  }
+}
 
 function createZip(sourceDir, outputFile, excludes) {
   const files = [];
