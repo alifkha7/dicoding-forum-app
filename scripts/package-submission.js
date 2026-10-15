@@ -15,6 +15,9 @@ const EXCLUDE_NAMES = new Set([
   '.scratch',
   '.gemini',
   'submission.zip',
+  'AGENTS.md',
+  'GLOSSARY.md',
+  'docs',
 ]);
 
 function createZip(sourceDir, outputFile, excludes) {

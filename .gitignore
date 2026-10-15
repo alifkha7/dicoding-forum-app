@@ -25,3 +25,9 @@ dist-ssr
 
 # Packaging archives
 *.zip
+
+# Skills and agent artifacts
+.scratch
+docs
+AGENTS.md
+GLOSSARY.md
