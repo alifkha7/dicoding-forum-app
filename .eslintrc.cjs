@@ -27,5 +27,6 @@ module.exports = {
     'react/prop-types': 'off',
     'no-alert': 'off',
     'no-underscore-dangle': 'off',
+    'linebreak-style': 'off',
   },
 };
