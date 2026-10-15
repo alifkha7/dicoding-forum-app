@@ -12,6 +12,7 @@ const EXCLUDE_NAMES = new Set([
   'node_modules',
   '.git',
   'dist',
+  'storybook-static',
   '.scratch',
   '.gemini',
   'submission.zip',
