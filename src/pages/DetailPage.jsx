@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import DOMPurify from 'dompurify';
 import {
   MessageSquare,
   ArrowLeft,
@@ -115,7 +116,7 @@ function DetailPage() {
 
         <div
           className="text-gray-800 leading-relaxed text-base prose max-w-none border-t border-b border-gray-100 py-6"
-          dangerouslySetInnerHTML={{ __html: body }}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(body) }}
         />
 
         <footer className="flex items-center gap-6 text-sm text-gray-600">

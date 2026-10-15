@@ -1,5 +1,6 @@
 /* eslint-disable react/no-danger */
 import React from 'react';
+import DOMPurify from 'dompurify';
 import VoteButtons from './VoteButtons';
 import { postedAt } from '../utils';
 
@@ -37,7 +38,7 @@ function CommentItem({
 
       <div
         className="text-sm text-gray-700 leading-relaxed break-words"
-        dangerouslySetInnerHTML={{ __html: content }}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }}
       />
 
       <footer className="flex items-center gap-4 pt-1 text-xs text-gray-500">

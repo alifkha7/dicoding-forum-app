@@ -13,6 +13,7 @@ import CommentItem from './CommentItem';
  *
  * - CommentItem component
  *  - should render author name, comment content, and vote counts correctly
+ *  - should sanitize harmful HTML tags and attributes with DOMPurify
  */
 describe('CommentItem component', () => {
   afterEach(() => {
@@ -54,5 +55,25 @@ describe('CommentItem component', () => {
 
     expect(screen.getByLabelText('Up votes')).toHaveTextContent('1');
     expect(screen.getByLabelText('Down votes')).toHaveTextContent('2');
+  });
+
+  it('should sanitize harmful HTML tags and attributes with DOMPurify', () => {
+    // arrange & act
+    render(
+      <CommentItem
+        content='<p>Komentar aman<script>alert(1)</script><img src="x" onerror="alert(1)" alt="gambar" /></p>'
+        createdAt={fakeComment.createdAt}
+        owner={fakeComment.owner}
+        upVotesBy={fakeComment.upVotesBy}
+        downVotesBy={fakeComment.downVotesBy}
+      />,
+    );
+
+    // assert
+    expect(screen.getByText('Komentar aman')).toBeInTheDocument();
+    expect(document.querySelector('script')).toBeNull();
+    const image = screen.getByAltText('gambar');
+    expect(image).toBeInTheDocument();
+    expect(image).not.toHaveAttribute('onerror');
   });
 });
