@@ -31,7 +31,12 @@ function createZip(sourceDir, outputFile, excludes) {
       const relativePath = path.relative(sourceDir, fullPath).replace(/\\/g, '/');
       const rootSegment = relativePath.split('/')[0];
 
-      if (excludes.has(rootSegment) || excludes.has(entry.name)) {
+      if (
+        excludes.has(rootSegment)
+        || excludes.has(entry.name)
+        || relativePath.startsWith('cypress/videos')
+        || relativePath.startsWith('cypress/screenshots')
+      ) {
         continue;
       }
 
